@@ -13,7 +13,7 @@ from hr_matcher import rank_candidates, get_candidate_status
 # PAGE CONFIG
 # ============================================================
 st.set_page_config(
-    page_title="AlignIQ - Smart Resume Alignment",
+    page_title="AlignIQ",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded")
