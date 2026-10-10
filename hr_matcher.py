@@ -116,14 +116,15 @@ def rank_candidates(
             continue
 
         if not name:
-            name = extract_candidate_name(resume_text)
-
+            name = extract_candidate_name(resume_text)        
+        candidate_name = extract_candidate_name(candidate["text"])
+        if not candidate_name:
+            candidate_name = candidate.get("name", "Unknown Candidate")
         result = calculate_candidate_match(
-            candidate_name=name,
-            resume_text=resume_text,
-            job_description=job_description
+            candidate_name,
+            candidate["text"],
+            job_description
         )
-
         results.append(result)
 
     # Highest score first
@@ -151,5 +152,3 @@ def get_candidate_status(score: int, threshold: int = 70) -> str:
         return "Moderate Match"
 
     return "Low Match"
-
-

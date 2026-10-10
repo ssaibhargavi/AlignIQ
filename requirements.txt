@@ -3,3 +3,4 @@ pandas
 pdfplumber
 python-docx
 reportlab
+psycopg[binary]

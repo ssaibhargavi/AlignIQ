@@ -1,13 +1,10 @@
 import re
 
-
 # ============================================================
 # CENTRAL SKILL TAXONOMY
 # ============================================================
 # IMPORTANT:
-# This taxonomy is used ONLY to DETECT skills that already
-# exist in the text being analyzed.
-#
+# This taxonomy is used ONLY to DETECT skills that already exist in the text being analyzed.
 # It does NOT add skills.
 # It does NOT infer skills.
 # It does NOT assume that related skills exist.
@@ -114,6 +111,37 @@ TAXONOMY_MAP = {
         "Data Visualization": [
             "data visualization",
             "data visualisation"
+        ],
+        
+        "PivotTables": [
+            "pivottables",
+            "pivot tables"
+        ],
+
+        "VLOOKUP": [
+            "vlookup"
+        ],
+
+        "XLOOKUP": [
+            "xlookup"
+        ],
+
+        "Exploratory Data Analysis": [
+            "exploratory data analysis",
+            "eda"
+        ],
+
+        "KPI Tracking": [
+            "kpi tracking",
+            "key performance indicator tracking"
+        ],
+
+        "Trend Analysis": [
+            "trend analysis"
+        ],
+
+        "Statistical Analysis": [
+            "statistical analysis"
         ]
     },
 
@@ -192,6 +220,25 @@ TAXONOMY_MAP = {
         "SQL Server": [
             "sql server",
             "mssql"
+        ],
+        
+        "SQL Joins": [
+            "joins",
+            "join"
+        ],
+
+        "Subqueries": [
+            "subqueries",
+            "subquery"
+        ],
+
+        "Aggregate Functions": [
+            "aggregate functions",
+            "aggregation functions"
+        ],
+
+        "GROUP BY": [
+            "group by"
         ]
     },
 
@@ -214,14 +261,6 @@ TAXONOMY_MAP = {
 
 
     "Software Development": {
-
-        "Git": [
-            "git"
-        ],
-
-        "GitHub": [
-            "github"
-        ],
 
         "REST APIs": [
             "rest api",
@@ -246,50 +285,131 @@ TAXONOMY_MAP = {
 
 
     "Web Development": {
-
         "React": [
             "react.js",
             "reactjs",
             "react"
         ],
-
         "Node.js": [
             "node.js",
             "nodejs"
         ],
-
+        "Spring Boot": [
+            "spring boot"
+        ],
+        "Spring MVC": [
+            "spring mvc"
+        ],
         "Django": [
             "django"
         ],
-
         "Flask": [
             "flask"
         ],
-
         "FastAPI": [
             "fastapi"
         ]
     },
 
+    "Software Engineering": {
+        "REST APIs": [
+            "rest api",
+            "rest apis",
+            "restful api",
+            "restful apis"
+        ],
+        "Microservices": [
+            "microservices",
+            "microservice"
+        ],
+        "JSON": [
+            "json"
+        ],
+        "MVC": [
+            "mvc",
+            "model view controller"
+        ],
+        "Code Review": [
+            "code review",
+            "code reviews"
+        ]
+    },
 
     "Cloud & DevOps": {
-
         "AWS": [
             "aws",
             "amazon web services"
         ],
-
         "Azure": [
-            "microsoft azure",
-            "azure"
+            "azure",
+            "microsoft azure"
         ],
-
         "Docker": [
             "docker"
         ],
-
+        "Jenkins": [
+            "jenkins"
+        ],
+        "CI/CD": [
+            "ci/cd",
+            "ci cd",
+            "continuous integration",
+            "continuous delivery",
+            "continuous deployment"
+        ],
         "Linux": [
             "linux"
+        ]
+    },
+
+    "Version Control": {
+        "Git": [
+            "git"
+        ],
+        "GitHub": [
+            "github"
+        ],
+        "GitLab": [
+            "gitlab"
+        ]
+    },
+
+    "Testing": {
+        "JUnit": [
+            "junit"
+        ],
+        "Mockito": [
+            "mockito"
+        ],
+        "Postman": [
+            "postman"
+        ]
+    },
+
+    "Development Tools": {
+        "IntelliJ IDEA": [
+            "intellij idea",
+            "intellij"
+        ],
+        "VS Code": [
+            "vs code",
+            "visual studio code"
+        ],
+        "Maven": [
+            "maven"
+        ]
+    },
+
+    "Methodologies": {
+        "Agile": [
+            "agile"
+        ],
+        "Scrum": [
+            "scrum"
+        ],
+        "SDLC": [
+            "sdlc",
+            "software development life cycle"
         ]
     }
 }

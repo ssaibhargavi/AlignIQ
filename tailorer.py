@@ -78,11 +78,12 @@ SECTION_SYNONYMS = {
         "accomplishments"
     ],
     "SOFT_SKILLS": [
-    "soft skills",
-    "professional skills",
-    "interpersonal skills",
-    "personal skills",
-    "strengths"
+        "soft skills",
+        "professional skills",
+        "interpersonal skills",
+        "personal skills",
+        "strengths",
+        "key strengths"
     ],
 
     "LANGUAGES": [
@@ -132,11 +133,9 @@ def normalize_line(line):
 
     if not line:
         return ""
-
+    line = re.sub(r"[*_`]", "", line).strip()
     line = str(line)
-
     line = line.replace("\u00a0", " ")
-
     line = re.sub(
         r"\s+",
         " ",
@@ -1286,12 +1285,11 @@ def parse_simple_list(lines):
         dict.fromkeys(items)
     )
 
-def parse_soft_skills(lines):
 
+def parse_soft_skills(lines):
     soft_skills = []
 
-    for raw_line in lines:
-
+    for raw_line in lines or []:
         line = normalize_line(raw_line)
 
         if not line:
@@ -1299,26 +1297,20 @@ def parse_soft_skills(lines):
 
         line = clean_bullet_marker(line)
 
-        # If skills are written like:
-        # Communication, Teamwork, Problem Solving
+        # Remove a trailing backslash from copied text
+        line = line.rstrip("\\").strip()
 
-        if "," in line:
+        # Support comma, bullet, pipe, and semicolon separators
+        items = re.split(r"\s*[,•|;]\s*", line)
 
-            skills = line.split(",")
+        for item in items:
+            item = item.strip()
 
-            for skill in skills:
+            if item:
+                soft_skills.append(item)
 
-                skill = skill.strip()
-
-                if skill:
-                    soft_skills.append(skill)
-
-        else:
-
-            soft_skills.append(line)
-
-    # Remove duplicates
     return list(dict.fromkeys(soft_skills))
+
 
 def extract_languages_from_personal_details(lines):
 
@@ -1390,97 +1382,264 @@ def normalize_section_heading(text):
     return text.strip()
 
 def parse_skills_section(lines):
-    """Parse only the explicit SKILLS section and group skills by matcher taxonomy."""
+    """
+    Parse only the explicit SKILLS section.
+
+    Supports formats such as:
+        Python, SQL, Power BI
+        Languages: Python, SQL
+        Libraries: Pandas, NumPy
+        Visualization: Power BI, Tableau
+        Database: MySQL, PostgreSQL
+        Tools: Excel, Git
+        Cloud: AWS
+        Analytics: Data Cleaning, EDA
+
+    Category labels are removed before skills are categorized.
+    """
 
     declared_skills = []
 
+    # --------------------------------------------------------
+    # CATEGORY LABELS
+    # --------------------------------------------------------
+
+    category_labels = {
+        "skills",
+        "technical skills",
+        "technical skill",
+        "key skills",
+        "core skills",
+        "core competencies",
+        "technical competencies",
+        "skills and tools",
+
+        "spreadsheet",
+
+        "programming",
+        "programming languages",
+        "languages",
+        "language",
+
+        "data analytics",
+        "data analysis",
+        "data science",
+        "analytics",
+
+        "data visualization",
+        "visualization",
+        "visualization and bi",
+        "visualization bi",
+
+        "libraries",
+        "frameworks",
+        "libraries and frameworks",
+        "frameworks and libraries",
+        "tools and libraries",
+
+        "database",
+        "databases",
+        "databases and storage",
+        "database and storage",
+
+        "apis",
+        "api",
+        "apis and architecture",
+        "api and architecture",
+        "architecture",
+
+        "cloud",
+        "cloud and devops",
+        "cloud devops",
+        "devops",
+
+        "version control",
+        "version control systems",
+
+        "testing",
+        "test tools",
+        "testing tools",
+
+        "development tools",
+        "developer tools",
+        "software tools",
+        "software and tools",
+        "tools",
+
+        "methodologies",
+        "methodology",
+        "development methodologies",
+
+        "technologies",
+        "technology",
+        "technology stack",
+        "tech stack",
+        "skills used",
+        "environment",
+
+        "other",
+        "other skills"
+    }
+
+    # --------------------------------------------------------
+    # EXTRACT ACTUAL SKILLS
+    # --------------------------------------------------------
+
     for raw_line in lines or []:
+
         line = normalize_line(raw_line)
+
         if not line:
             continue
 
-        # Remove common labels such as "Programming:" or "Skills:" while
-        # preserving the actual skill values.
-        if ":" in line:
-            prefix, value = line.split(":", 1)
+        line = clean_bullet_marker(line)
 
-            normalized_prefix = re.sub(
-                r"[^a-z0-9]+",
-                " ",
-                prefix.strip().lower()
+        if not line:
+            continue
+
+        # ----------------------------------------------------
+        # SPLIT THE LINE INTO SKILL PARTS
+        # ----------------------------------------------------
+
+        parts = re.split(
+            r"\s*[|,;]\s*",
+            line
+        )
+
+        for part in parts:
+
+            part = part.strip()
+
+            if not part:
+                continue
+
+            # ------------------------------------------------
+            # HANDLE "CATEGORY: skill" FORMAT
+            # ------------------------------------------------
+            #
+            # Example:
+            # Languages: Python
+            #
+            # becomes:
+            # Python
+            #
+            # Example:
+            # Libraries: Pandas
+            #
+            # becomes:
+            # Pandas
+            # ------------------------------------------------
+
+            if ":" in part:
+
+                prefix, value = part.split(
+                    ":",
+                    1
+                )
+
+                prefix = prefix.strip()
+                value = value.strip()
+
+                normalized_prefix = normalize_section_heading(
+                    prefix
+                )
+
+                # If the text before ":" is a known
+                # category label, keep only the actual skill.
+                if normalized_prefix in category_labels:
+
+                    part = value
+
+                else:
+
+                    # Keep the original text if the
+                    # prefix is not a known category.
+                    part = part.strip()
+
+            else:
+
+                # No category prefix.
+                # Keep the skill as it is.
+                part = part.strip()
+
+            if not part:
+                continue
+
+            # ------------------------------------------------
+            # REMOVE CATEGORY LABELS THAT APPEAR ALONE
+            # ------------------------------------------------
+
+            normalized_part = normalize_section_heading(
+                part.rstrip(":").strip()
             )
 
-            normalized_prefix = re.sub(
-                r"\s+",
-                " ",
-                normalized_prefix
-            ).strip()
+            if normalized_part in category_labels:
+                continue
 
-            if normalized_prefix in {
-                "skills",
-                "technical skills",
-                "technical skill",
-                "key skills",
-                "core skills",
-                "core competencies",
-                "technical competencies",
-                "skills and tools",
-                "programming",
-                "databases",
-                "data analytics",
-                "libraries",
-                "other",
-                "tools",
-                "technologies",
-                "technology",
-                "tech stack",
-                "skills used",
-                "environment"
-            }:
-                line = value.strip()
+            declared_skills.append(
+                part.rstrip(":").strip()
+            )
 
-        line = re.sub(r"^[\u2022*\-–—]+\s*", "", line).strip()
-        if not line:
-            continue
+    # --------------------------------------------------------
+    # REMOVE DUPLICATES
+    # --------------------------------------------------------
 
-        # Support comma/semicolon/pipe separated skill dumps.
-        parts = re.split(r"\s*[|,;]\s*", line)
-        for part in parts:
-            part = part.strip()
-            if part:
-                declared_skills.append(part)
-
-    # Preserve candidate order while removing duplicates.
     unique_declared = []
+
     seen = set()
+
     for skill in declared_skills:
-        key = re.sub(r"\s+", " ", skill.lower()).strip()
+
+        key = re.sub(
+            r"\s+",
+            " ",
+            skill.lower()
+        ).strip()
+
         if key not in seen:
+
             seen.add(key)
-            unique_declared.append(skill)
+
+            unique_declared.append(
+                skill
+            )
+
+    
+    # --------------------------------------------------------
+    # CATEGORIZE USING TAXONOMY
+    # --------------------------------------------------------
 
     categorized = {}
+    unrecognized = []
+
     taxonomy_order = list(TAXONOMY_MAP.keys())
 
     for declared in unique_declared:
         detected = search_skills(declared)
+        matched_any = False
+
         for category in taxonomy_order:
             matched = detected.get(category, [])
+
             if matched:
                 bucket = categorized.setdefault(category, [])
+
                 for skill in matched:
                     if skill not in bucket:
                         bucket.append(skill)
+
+                matched_any = True
                 break
 
-    # Keep explicitly declared skills that are outside the current taxonomy.
-    recognized = {skill for skills in categorized.values() for skill in skills}
-    other = [skill for skill in unique_declared if skill not in recognized]
-    if other:
-        categorized["Other Skills"] = other
+        # Keep a skill in Other Skills only when the
+        # taxonomy genuinely does not recognize it.
+        if not matched_any:
+            unrecognized.append(declared)
+
+    if unrecognized:
+        categorized["Other Skills"] = unrecognized
 
     return categorized
-
 
 def get_master_resume_skills(master_text):
     """Return skills only from the explicit SKILLS section."""
